@@ -1,12 +1,24 @@
 package com.udacity.stockhawk.ui;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.facebook.stetho.common.ArrayListAccumulator;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Stock;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by rkalonji on 01/26/2017.
@@ -25,6 +37,24 @@ public class StockHistoryActivity extends Activity {
         Stock stock = (Stock) i.getParcelableExtra("SelectedStock");
 
         TextView historyView = (TextView) findViewById(R.id.stock_history_history);
-        historyView.setText(stock.getmHistory());
+        historyView.setText(stock.getmSymbol());
+
+        LineChart lineChart = (LineChart) findViewById(R.id.line_chart_view);
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+        List<String> quotes = Arrays.asList(stock.getmHistory().split("\\r?\\n"));
+        Collections.reverse(quotes);
+        int j = 0;
+        for (String quote:quotes) {
+            String[] values = quote.split(",");
+            BigInteger x = new BigInteger(values[0]);
+            Float y = Float.parseFloat(values[1]);
+            // entries.add(new Entry(Float.parseFloat(values[0]), Float.parseFloat(values[1])));
+            entries.add(new Entry((float)j, Float.parseFloat(values[1])));
+            j++;
+        }
+        LineDataSet dataSet= new LineDataSet(entries, "Label");
+        LineData lineData = new LineData(dataSet);
+        lineChart.setData(lineData);
+        lineChart.invalidate();
     }
 }
