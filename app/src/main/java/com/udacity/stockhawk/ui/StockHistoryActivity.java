@@ -15,10 +15,17 @@ import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Stock;
 
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by rkalonji on 01/26/2017.
@@ -43,12 +50,21 @@ public class StockHistoryActivity extends Activity {
         ArrayList<Entry> entries = new ArrayList<Entry>();
         List<String> quotes = Arrays.asList(stock.getmHistory().split("\\r?\\n"));
         Collections.reverse(quotes);
+
+        Calendar cl = Calendar.getInstance();
+        String time = "" + cl.get(Calendar.HOUR_OF_DAY) + ":" + cl.get(Calendar.MINUTE) + ":" + cl.get(Calendar.SECOND);
+
         int j = 0;
         for (String quote:quotes) {
             String[] values = quote.split(",");
             BigInteger x = new BigInteger(values[0]);
             Float y = Float.parseFloat(values[1]);
-            // entries.add(new Entry(Float.parseFloat(values[0]), Float.parseFloat(values[1])));
+            try {
+                cl.setTime(new SimpleDateFormat("MM-dd-YY").parse(values[0]));
+            } catch (ParseException e) {
+            }
+            String date =  cl.get(Calendar.MONTH) + "-" + cl.get(Calendar.DAY_OF_MONTH) + "-" + cl.get(Calendar.YEAR);
+            // entries.add(date, Float.parseFloat(values[1])));
             entries.add(new Entry((float)j, Float.parseFloat(values[1])));
             j++;
         }
