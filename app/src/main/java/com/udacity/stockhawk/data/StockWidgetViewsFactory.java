@@ -3,9 +3,9 @@ package com.udacity.stockhawk.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -78,8 +78,16 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
 
     private void initData() {
         mCollections.clear();
-        for (int i = 1; i <= 10; i++) {
-            mCollections.add("ListView item " + i);
+
+        Cursor c = mContext.getApplicationContext().getContentResolver().query(Contract.Quote.URI,
+                null, null, null, null);
+
+        if (c != null && c.moveToFirst()) {
+            do {
+                mCollections.add(
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_SYMBOL)) +
+                        "|" + c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PRICE)));
+            } while (c.moveToNext());
         }
     }
 

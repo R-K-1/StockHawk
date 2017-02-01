@@ -47,7 +47,7 @@
                     android:id="@+id/txvWidgetTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Wall Street Hello"
+                    android:text=""
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#4B4B4D" />
             </LinearLayout>
