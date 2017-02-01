@@ -6,10 +6,11 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
+
+import com.udacity.stockhawk.R;
 
 /**
  * Created by rkalonji on 01/31/2017.
@@ -17,6 +18,7 @@ import android.widget.RemoteViewsService.RemoteViewsFactory;
 
 public class StockWidgetViewsFactory implements RemoteViewsFactory {
     List<String> mCollections = new ArrayList<String>();
+    List<Stock> mStockCollections = new ArrayList<Stock>();
 
     Context mContext = null;
 
@@ -41,10 +43,31 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int position) {
-        RemoteViews mView = new RemoteViews(mContext.getPackageName(),
-                android.R.layout.simple_list_item_1);
-        mView.setTextViewText(android.R.id.text1, mCollections.get(position));
-        mView.setTextColor(android.R.id.text1, Color.BLACK);
+        RemoteViews mView = new RemoteViews(mContext.getPackageName(), R.layout.list_item_quote);
+        Stock stock = mStockCollections.get(position);
+        mView.setTextViewText(R.id.symbol, stock.getmSymbol());
+        mView.setTextViewText(R.id.price, stock.getmPrice());
+
+        float rawAbsoluteChange = Float.parseFloat(stock.getmAbsoluteChange());
+        float percentageChange = Float.parseFloat(stock.getmPercentageChange());
+
+        if (rawAbsoluteChange > 0) {
+            mView.setInt(R.id.change, "setBackgroundResource",
+                    R.drawable.percent_change_pill_green);
+        } else {
+            mView.setInt(R.id.change, "setBackgroundResource",
+                    R.drawable.percent_change_pill_red);
+        }
+
+        String change = PrefUtils.dollarFormatWithPlus(rawAbsoluteChange);
+        String percentage = PrefUtils.percentageFormat(percentageChange / 100);
+
+        if (PrefUtils.getDisplayMode(mContext)
+                .equals(mContext.getString(R.string.pref_display_mode_absolute_key))) {
+            mView.setTextViewText(R.id.change, change);
+        } else {
+            mView.setTextViewText(R.id.change, percentage);
+        }
 
         final Intent fillInIntent = new Intent();
         fillInIntent.setAction(StockWidgetProvider.ACTION_TOAST);
@@ -52,7 +75,7 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
         bundle.putString(StockWidgetProvider.EXTRA_STRING,
                 mCollections.get(position));
         fillInIntent.putExtras(bundle);
-        mView.setOnClickFillInIntent(android.R.id.text1, fillInIntent);
+        mView.setOnClickFillInIntent(R.id.list_item_linear_layout, fillInIntent);
         return mView;
     }
 
@@ -87,6 +110,14 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
                 mCollections.add(
                         c.getString(c.getColumnIndex(Contract.Quote.COLUMN_SYMBOL)) +
                         "|" + c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PRICE)));
+
+                mStockCollections.add(new Stock(
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_SYMBOL)),
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PRICE)),
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_ABSOLUTE_CHANGE)),
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PERCENTAGE_CHANGE)),
+                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_HISTORY))
+                ));
             } while (c.moveToNext());
         }
     }

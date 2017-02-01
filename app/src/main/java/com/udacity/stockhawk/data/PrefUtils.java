@@ -6,8 +6,11 @@ import android.preference.PreferenceManager;
 
 import com.udacity.stockhawk.R;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public final class PrefUtils {
@@ -87,4 +90,20 @@ public final class PrefUtils {
 
         editor.apply();
     }
+
+    public static String dollarFormatWithPlus (Float price) {
+        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
+        decimalFormat.setPositivePrefix("+$");
+        return decimalFormat.format(price);
+    }
+
+    public static String percentageFormat (Float percentage) {
+        DecimalFormat decimalFormat =
+                (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
+        decimalFormat.setMaximumFractionDigits(2);
+        decimalFormat.setMinimumFractionDigits(2);
+        decimalFormat.setPositivePrefix("+");
+        return decimalFormat.format(percentage);
+    }
+
 }
