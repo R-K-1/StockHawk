@@ -17,7 +17,6 @@ import com.udacity.stockhawk.R;
  */
 
 public class StockWidgetViewsFactory implements RemoteViewsFactory {
-    List<String> mCollections = new ArrayList<String>();
     List<Stock> mStockCollections = new ArrayList<Stock>();
 
     Context mContext = null;
@@ -28,7 +27,7 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return mCollections.size();
+        return mStockCollections.size();
     }
 
     @Override
@@ -70,10 +69,10 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
         }
 
         final Intent fillInIntent = new Intent();
-        fillInIntent.setAction(StockWidgetProvider.ACTION_TOAST);
+        fillInIntent.setAction(StockWidgetProvider.ACTION_VIEW_STOCK_HISTORY);
         final Bundle bundle = new Bundle();
-        bundle.putString(StockWidgetProvider.EXTRA_STRING,
-                mCollections.get(position));
+        bundle.putParcelable(StockWidgetProvider.EXTRA_SELECTED_STOCK,
+                stock);
         fillInIntent.putExtras(bundle);
         mView.setOnClickFillInIntent(R.id.list_item_linear_layout, fillInIntent);
         return mView;
@@ -100,17 +99,13 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
     }
 
     private void initData() {
-        mCollections.clear();
+        mStockCollections.clear();
 
         Cursor c = mContext.getApplicationContext().getContentResolver().query(Contract.Quote.URI,
                 null, null, null, null);
 
         if (c != null && c.moveToFirst()) {
             do {
-                mCollections.add(
-                        c.getString(c.getColumnIndex(Contract.Quote.COLUMN_SYMBOL)) +
-                        "|" + c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PRICE)));
-
                 mStockCollections.add(new Stock(
                         c.getString(c.getColumnIndex(Contract.Quote.COLUMN_SYMBOL)),
                         c.getString(c.getColumnIndex(Contract.Quote.COLUMN_PRICE)),
@@ -123,7 +118,5 @@ public class StockWidgetViewsFactory implements RemoteViewsFactory {
     }
 
     @Override
-    public void onDestroy() {
-
-    }
+    public void onDestroy() { }
 }

@@ -6,8 +6,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.ui.StockHistoryActivity;
@@ -17,15 +17,18 @@ import com.udacity.stockhawk.ui.StockHistoryActivity;
  */
 
 public class StockWidgetProvider extends AppWidgetProvider {
-    public static final String ACTION_TOAST = "TOAST";
-    public static final String EXTRA_STRING = "EXTRA_STRING";
+    public static final String ACTION_VIEW_STOCK_HISTORY = "VIEW_STOCK_HISTORY";
+    public static final String EXTRA_SELECTED_STOCK = "SELECTED_STOCK";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(ACTION_TOAST)) {
-            String item = intent.getExtras().getString(EXTRA_STRING);
-            Toast.makeText(context, item, Toast.LENGTH_LONG).show();
+        if (intent.getAction().equals(ACTION_VIEW_STOCK_HISTORY)) {
+            Intent i = new Intent(context, StockHistoryActivity.class);
+            Stock stock = (Stock) intent.getParcelableExtra(EXTRA_SELECTED_STOCK);
+            i.putExtra("SelectedStock",(Parcelable) stock);
+            context.startActivity(i);
         }
+
         super.onReceive(context, intent);
     }
 
@@ -36,7 +39,8 @@ public class StockWidgetProvider extends AppWidgetProvider {
 
             // Adding collection list item handler
             final Intent onItemClick = new Intent(context, StockWidgetProvider.class);
-            onItemClick.setAction(ACTION_TOAST);
+            // onItemClick.setAction(ACTION_TOAST);
+            onItemClick.setAction(ACTION_VIEW_STOCK_HISTORY);
             onItemClick.setData(Uri.parse(onItemClick.toUri(Intent.URI_INTENT_SCHEME)));
             final PendingIntent onClickPendingIntent = PendingIntent
                     .getBroadcast(context, 0, onItemClick, PendingIntent.FLAG_UPDATE_CURRENT);
