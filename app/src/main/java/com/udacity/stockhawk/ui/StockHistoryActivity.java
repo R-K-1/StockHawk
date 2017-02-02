@@ -7,13 +7,16 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.facebook.stetho.common.ArrayListAccumulator;
+import com.facebook.stetho.common.StringUtil;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Stock;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,25 +55,34 @@ public class StockHistoryActivity extends Activity {
         Collections.reverse(quotes);
 
         Calendar cl = Calendar.getInstance();
-        String time = "" + cl.get(Calendar.HOUR_OF_DAY) + ":" + cl.get(Calendar.MINUTE) + ":" + cl.get(Calendar.SECOND);
+
+        ArrayList<String> dates = new ArrayList<String>();
 
         int j = 0;
         for (String quote:quotes) {
             String[] values = quote.split(",");
-            BigInteger x = new BigInteger(values[0]);
-            Float y = Float.parseFloat(values[1]);
+
             try {
                 cl.setTime(new SimpleDateFormat("MM-dd-YY").parse(values[0]));
             } catch (ParseException e) {
             }
+            
             String date =  cl.get(Calendar.MONTH) + "-" + cl.get(Calendar.DAY_OF_MONTH) + "-" + cl.get(Calendar.YEAR);
-            // entries.add(date, Float.parseFloat(values[1])));
+            dates.add(date);
             entries.add(new Entry((float)j, Float.parseFloat(values[1])));
             j++;
         }
-        LineDataSet dataSet= new LineDataSet(entries, "Label");
+        LineDataSet dataSet= new LineDataSet(entries, "");
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
+
+        XAxis xAxis = lineChart.getXAxis();
+        Object[] datesObject = dates.toArray();
+        xAxis.setValueFormatter(new MyValueFormatter(Arrays.copyOf(datesObject,datesObject.length,
+                String[].class)));
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChart.getAxisRight().setDrawLabels(false);
+
         lineChart.invalidate();
     }
 }
