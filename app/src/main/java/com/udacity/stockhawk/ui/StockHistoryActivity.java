@@ -66,7 +66,7 @@ public class StockHistoryActivity extends Activity {
                 cl.setTime(new SimpleDateFormat("MM-dd-YY").parse(values[0]));
             } catch (ParseException e) {
             }
-            
+
             String date =  cl.get(Calendar.MONTH) + "-" + cl.get(Calendar.DAY_OF_MONTH) + "-" + cl.get(Calendar.YEAR);
             dates.add(date);
             entries.add(new Entry((float)j, Float.parseFloat(values[1])));
