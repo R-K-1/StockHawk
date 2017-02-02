@@ -3,6 +3,7 @@ package com.udacity.stockhawk.ui;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -48,6 +49,7 @@ public class StockHistoryActivity extends Activity {
 
         TextView historyView = (TextView) findViewById(R.id.stock_history_history);
         historyView.setText(stock.getmSymbol());
+        historyView.setTextColor(Color.BLUE);
 
         LineChart lineChart = (LineChart) findViewById(R.id.line_chart_view);
         ArrayList<Entry> entries = new ArrayList<Entry>();
@@ -81,7 +83,9 @@ public class StockHistoryActivity extends Activity {
         xAxis.setValueFormatter(new MyValueFormatter(Arrays.copyOf(datesObject,datesObject.length,
                 String[].class)));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.BLUE);
         lineChart.getAxisRight().setDrawLabels(false);
+        lineChart.getAxisLeft().setTextColor(Color.BLUE);
 
         lineChart.invalidate();
     }
